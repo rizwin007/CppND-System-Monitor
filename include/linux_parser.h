@@ -18,9 +18,19 @@ const std::string kVersionFilename{"/version"};
 const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
 
+const std::string filterProcesses("processes");
+const std::string filterRunningProcesses("procs_running");
+const std::string filterMemTotalString("MemTotal:");
+const std::string filterMemFreeString("MemFree:");
+const std::string filterCpu("cpu");
+const std::string filterUID("Uid:");
+// https://man7.org/linux/man-pages/man5/proc.5.html
+// Using VmRSS instead of VmSize to display physical RAM usage and not virtual memory
+const std::string filterProcMem("VmRSS:"); // The string can be VmSize As well
+
 // System
 float MemoryUtilization();
-long UpTime();
+long int UpTime();
 std::vector<int> Pids();
 int TotalProcesses();
 int RunningProcesses();
@@ -40,6 +50,15 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
+
+// /proc/[pid]/stat
+enum ProcessTime {
+  kUtime_ = 13, // user mode time
+  kStime_,      // kernel mode time
+  kCutime_,     // waited for children to be scheduled in user mode
+  kCstime_      // waited for children to be scheduled in kernel mode
+};
+
 std::vector<std::string> CpuUtilization();
 long Jiffies();
 long ActiveJiffies();

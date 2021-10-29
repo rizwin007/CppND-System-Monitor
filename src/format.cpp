@@ -1,47 +1,35 @@
 #include <string>
+#include <chrono>
+#include <iomanip>      // std::setfill
 
 #include "format.h"
 
 using std::string;
 
-// TODO: Complete this helper function
 // INPUT: Long int measuring seconds
 // OUTPUT: HH:MM:SS
-// REMOVE: [[maybe_unused]] once you define the function
-string Format::ElapsedTime(long seconds[[maybe_unused]]) { 
+string Format::ElapsedTime(long seconds) {
+  std::chrono::seconds totalSeconds{seconds};
 
-    long hr, min, sec, min_in_sec;
-    string s_hr, s_min, s_sec, final_string;
+  // return std::chrono::format("%T", seconds); // in C++20 :-)
 
-    hr = seconds / 3600;
-    min_in_sec = seconds % 3600;
+  std::chrono::hours hours =
+      std::chrono::duration_cast<std::chrono::hours>(totalSeconds);
 
-    min = min_in_sec / 60;
+  totalSeconds -= std::chrono::duration_cast<std::chrono::seconds>(hours);
 
-    sec = min_in_sec % 60;
+  std::chrono::minutes minutes =
+      std::chrono::duration_cast<std::chrono::minutes>(totalSeconds);
 
-    if(hr < 10) {
-        s_hr = "0" + std::to_string(hr);
-    }
-    else {
-        s_hr = std::to_string(hr);
-    }
+  totalSeconds -= std::chrono::duration_cast<std::chrono::seconds>(minutes);
 
-    if(min < 10) {
-        s_min = "0" + std::to_string(min);
-    }
-    else {
-        s_min = std::to_string(min);
-    }
+  std::stringstream stream{};
 
-    if(sec < 10) {
-        s_sec = "0" + std::to_string(sec);
-    }
-    else {
-        s_sec = std::to_string(sec);
-    }
+  stream << std::setw(2) << std::setfill('0') << hours.count()      // HH
+     << std::setw(1) << ":"                                         // :
+     << std::setw(2) << std::setfill('0') << minutes.count()        // MM
+     << std::setw(1) << ":"                                         // :
+     << std::setw(2) << std::setfill('0') << totalSeconds.count();  // SS
 
-    final_string = s_hr + ":" + s_min + ":" + s_sec;
-
-    return final_string; 
+  return stream.str();
 }
