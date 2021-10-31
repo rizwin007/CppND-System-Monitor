@@ -35,6 +35,7 @@ float Process::CpuUtilization() {
     } 
     catch (const std::exception& e) { // caught by reference to base
         std::cout << "Exception was caught in Process::Pid() with message '"<< e.what() << "'\n";
+        m_util = 0;
     }
 
     return m_util; 

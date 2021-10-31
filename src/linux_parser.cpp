@@ -71,10 +71,10 @@ string LinuxParser::OperatingSystem() {
           return value;
         }
       }
-    }
-
+    }  
     filestream.close();
   }
+
   return value;
 }
 
@@ -89,6 +89,7 @@ string LinuxParser::Kernel() {
     linestream >> os >> version >> kernel;
     stream.close();
   }
+  
   return kernel;
 }
 
@@ -151,7 +152,7 @@ long LinuxParser::Jiffies() {
 long LinuxParser::ActiveJiffies(int pid) { 
   string line;
   string sValue;
-  long totalTime;
+  long totalTime = 0;
 
   vector <string> values;
 
@@ -172,7 +173,6 @@ long LinuxParser::ActiveJiffies(int pid) {
       std::cout << "Exception was caught in LinuxParser::ActiveJiffies(pid) with message '"
                 << e.what() << "'\n";
     }
-
     filestream.close();
   }
 
@@ -212,10 +212,9 @@ vector<string> LinuxParser::CpuUtilization() {
     while(linestream >> jiffy) {
       jiffies.emplace_back(jiffy);
     }
-
     filestream.close();
   }
-
+  
   return jiffies;
  }
 
@@ -289,7 +288,7 @@ string LinuxParser::User(int pid) {
         }
       }
       if(exit) break;
-    }
+    }  
     filestream.close();
   }
 
@@ -312,13 +311,15 @@ long LinuxParser::UpTime(int pid) {
     while(linestream >> sValue) {
         values.emplace_back(sValue);
     }
-
     filestream.close();
   }
+  
 
   try { 
-    // index 21 is starttime  
-    uptime = stol(values[21]) / sysconf(_SC_CLK_TCK);
+    if(!values.empty()) { // prevent accessing invalid memory
+      // index 21 is starttime  
+      uptime = stol(values[21]) / sysconf(_SC_CLK_TCK);
+    }
   } 
   catch (const std::exception& e) { // caught by reference to base
     std::cout << "Exception was caught in LinuxParser::UpTime(pid) with message '"

@@ -20,9 +20,21 @@ vector<Process>& System::Processes() {
 
     vector<int> pids = LinuxParser::Pids();
 
+    processes_.clear();
+
     for(const int & pid: pids) {
-        processes_.emplace_back(pid);
+        if((LinuxParser::Ram(pid) != "0.00")) {
+            Process p(pid);
+            float cpuUtil = p.CpuUtilization() * 100;
+
+            if(cpuUtil > 0) {
+                processes_.emplace_back(p);
+            }
+        }
     }
+
+    std::sort(processes_.begin(), processes_.end());
+
     return processes_; 
 }
 
